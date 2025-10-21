@@ -17,6 +17,14 @@ const Usuario = {
         return result.recordset[0];
     },
 
+    findByCorreo: async (correo) => {
+        const db = await conectarDb();
+        const result = await db.request()
+            .input('Correo', sql.NVarChar, correo)
+            .query(`SELECT * FROM ${table} WHERE Correo = @Correo`);
+        return result.recordset[0];
+    },
+
     create: async (user) => {
         const db = await conectarDb();
         const result = await db.request()
