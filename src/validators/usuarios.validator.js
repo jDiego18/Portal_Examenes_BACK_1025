@@ -1,8 +1,17 @@
 import {body, param} from "express-validator";
+import Usuario from "../models/usuarios.model.js";
 
 export const createUsuarioValidator = [
     body('Nombre').isString().withMessage('El nombre es obligatorio.'),
-    body('Correo').isEmail().withMessage('El correo es obligatorio y debe ser un correo válido.'),
+    body('Correo')
+        .isEmail().withMessage('El correo es obligatorio y debe ser un correo válido.')
+        .custom(async (correo) => {
+            const existente = await Usuario.findByCorreo(correo);
+            if (existente) {
+                throw new Error('El correo ya está registrado.');
+            }
+            return true;
+        }),
     body('Rol_Id').isInt().withMessage('El rol es obligatorio.'),
     body('Creado_Por_Id').isInt().withMessage('El campo creado por es obligatorio.')
 ];
