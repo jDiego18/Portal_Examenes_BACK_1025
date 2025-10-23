@@ -37,4 +37,17 @@ export const remove = async (req, res) => {
     const usuario = await Usuario.remove(id);
     if (!usuario) return notFound(res, 'Usuario no encontrado');
     noContent(res); 
-}
+};
+
+export const setPassword = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return badRequest(res, errors.array());
+
+    const { id } = req.params;
+
+    const usuarioExistente = await Usuario.findById(id);
+    if (!usuarioExistente) return notFound(res, 'Usuario no encontrado');
+
+    const actualizado = await Usuario.setPassword(id, req.body);
+    ok(res, actualizado);
+};

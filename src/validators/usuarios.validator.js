@@ -24,3 +24,14 @@ export const updateUsuarioValidator = [
     body('Rol_Id').isInt().withMessage('El rol es obligatorio.'),
     body('Estatus_Id').isInt().withMessage('El estatus es obligatorio.')
 ];
+
+export const setPasswordValidator = [
+    param('id').isInt().withMessage('El ID del usuario es obligatorio.'),
+    body('Contraseña')
+        .isLength({ min: 6 })
+        .withMessage('La contraseña debe tener al menos 6 caracteres.'),
+    body('Confirmacion')
+        .custom((value, { req }) => value === req.body.Contraseña)
+        .withMessage('La confirmación de la contraseña no coincide.'),
+    body('Actualizado_Por_Id').isInt().withMessage('El valor de Actualizado_Por_Id es obligatorio.')
+];
