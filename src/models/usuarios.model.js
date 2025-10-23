@@ -1,4 +1,5 @@
 import { conectarDb, sql } from "../config/db.js";
+import bcrypt from "bcrypt";
 
 const table = "dbo.Usuarios";
 
@@ -44,7 +45,7 @@ const Usuario = {
 
     update: async (id, user) => {
         const db = await conectarDb();
-        await db.request()
+        const result = await db.request()
             .input('Id', sql.Int, id)
             .input('Nombre', sql.NVarChar, user.Nombre)
             .input('Correo', sql.NVarChar, user.Correo)
@@ -57,9 +58,21 @@ const Usuario = {
 
     remove: async (id) => {
         const db = await conectarDb();
-        await db.request()
+        const result = await db.request()
             .input('Id', sql.Int, id)
             .query(`DELETE FROM ${table} WHERE Usuarios_Id = @Id`);
+        return result.rowsAffected[0] > 0;
+    },
+
+    setPassword: async (id, user) => {
+        const db = await conectarDb();
+        const hash = await bcrypt.hash(user.Contraseña, 10);
+        const result = await db.request()
+            .input('Id', sql.Int, id)
+            .input('Contraseña', sql.NVarChar, hash)
+            .input('Actualizado_Por_Id', sql.Int, user.Actualizado_Por_Id)
+            .input('Fecha_Ultima_Actualizacion', sql.DateTime, new Date())
+            .query(`UPDATE ${table} SET Contraseña = @Contraseña, Actualizado_Por_Id = @Actualizado_Por_Id, Fecha_Ultima_Actualizacion = @Fecha_Ultima_Actualizacion WHERE Usuarios_Id = @Id`);
         return result.rowsAffected[0] > 0;
     }
 };
